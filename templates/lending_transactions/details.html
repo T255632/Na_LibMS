@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lending Transaction Details - NaLib</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header>
+        <h1>NaLib Library Management System</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/genres/">Genres</a></li>
+            <li><a href="/library_resources/">Library Resources</a></li>
+            <li><a href="/members/">Members</a></li>
+            <li><a href="/staff/">Staff</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Lending Transaction Details</h2>
+        <p><strong>Member:</strong> {{ transaction.member.name }}</p>
+        <p><strong>Library Resource:</strong> {{ transaction.library_resource.title }}</p>
+        <p><strong>Borrowed On:</strong> {{ transaction.borrowed_on }}</p>
+        <p><strong>Due Date:</strong> {{ transaction.due_date }}</p>
+        <p><strong>Returned On:</strong> {{ transaction.returned_on or "Not Returned" }}</p>
+        <p><strong>Status:</strong> {{ transaction.status }}</p>
+        <p><strong>Condition on Return:</strong> {{ transaction.condition_on_return }}</p>
+        <p><strong>Staff:</strong> {{ transaction.staff.name }}</p>
+        <a href="/lending_transactions/edit/{{ transaction.transaction_id }}">Edit Transaction</a>
+    </main>
+    <footer>
+        <p>&copy; 2025 NaLib. All rights reserved.</p>
+    </footer>
+</body>
+</html>

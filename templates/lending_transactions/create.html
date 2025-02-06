@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Lending Transaction - NaLib</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header>
+        <h1>NaLib Library Management System</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/genres/">Genres</a></li>
+            <li><a href="/library_resources/">Library Resources</a></li>
+            <li><a href="/members/">Members</a></li>
+            <li><a href="/staff/">Staff</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Create New Lending Transaction</h2>
+        <form method="POST" action="/lending_transactions/create">
+            <div>
+                <label for="member">Member</label>
+                <select id="member" name="member_id">
+                    {% for member in members %}
+                        <option value="{{ member.member_id }}">{{ member.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="resource">Library Resource</label>
+                <select id="resource" name="resource_id">
+                    {% for resource in resources %}
+                        <option value="{{ resource.resource_id }}">{{ resource.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="due_date">Due Date</label>
+                <input type="datetime-local" id="due_date" name="due_date" required>
+            </div>
+            <div>
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    <option value="borrowed">Borrowed</option>
+                    <option value="overdue">Overdue</option>
+                    <option value="returned">Returned</option>
+                    <option value="damaged">Damaged</option>
+                    <option value="lost">Lost</option>
+                </select>
+            </div>
+            <div>
+                <label for="condition_on_return">Condition on Return</label>
+                <select id="condition_on_return" name="condition_on_return">
+                    <option value="good">Good</option>
+                    <option value="damaged">Damaged</option>
+                    <option value="lost">Lost</option>
+                </select>
+            </div>
+            <button type="submit">Create Transaction</button>
+        </form>
+    </main>
+    <footer>
+        <p>&copy; 2025 NaLib. All rights reserved.</p>
+    </footer>
+</body>
+</html>

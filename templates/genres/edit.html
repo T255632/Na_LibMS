@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Genre - NaLib</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header>
+        <h1>NaLib Library Management System</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/genres/">Genres</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Edit Genre</h2>
+        <form action="/genres/edit/1" method="POST">
+            <label for="name">Genre Name:</label>
+            <input type="text" id="name" name="name" value="Fiction" required><br>
+
+            <button type="submit">Update Genre</button>
+        </form>
+    </main>
+    <footer>
+        <p>&copy; 2025 NaLib. All rights reserved.</p>
+    </footer>
+</body>
+</html>
