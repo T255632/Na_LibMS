@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Staff - NaLib</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header>
+        <h1>NaLib Library Management System</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/genres/">Genres</a></li>
+            <li><a href="/library_resources/">Library Resources</a></li>
+            <li><a href="/members/">Members</a></li>
+            <li><a href="/staff/">Staff</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Create New Staff</h2>
+        <form method="POST" action="/staff/create">
+            <div>
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div>
+                <label for="qualification">Qualification</label>
+                <textarea id="qualification" name="qualification"></textarea>
+            </div>
+            <div>
+                <label for="experience">Experience</label>
+                <textarea id="experience" name="experience"></textarea>
+            </div>
+            <div>
+                <label for="skill_set">Skill Set</label>
+                <textarea id="skill_set" name="skill_set"></textarea>
+            </div>
+            <div>
+                <label for="grade">Grade</label>
+                <input type="text" id="grade" name="grade">
+            </div>
+            <div>
+                <label for="role">Role</label>
+                <select id="role" name="role">
+                    <option value="Admin">Admin</option>
+                    <option value="Staff">Staff</option>
+                    <option value="Member">Member</option>
+                </select>
+            </div>
+            <div>
+                <label for="status">Active</label>
+                <input type="checkbox" id="status" name="status" checked>
+            </div>
+            <button type="submit">Create Staff</button>
+        </form>
+    </main>
+    <footer>
+        <p>&copy; 2025 NaLib. All rights reserved.</p>
+    </footer>
+</body>
+</html>

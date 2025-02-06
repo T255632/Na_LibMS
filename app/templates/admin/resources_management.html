@@ -1,0 +1,50 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+    <div class="resource-management">
+        <h2>Library Resources</h2>
+        <a href="{{ url_for('admin.add_resource') }}" class="btn-add">
+            <i class="fas fa-plus-circle" style="font-size: 24px;"></i> 
+            <span>Add New Resource</span>
+        </a>
+        <a href="{{ url_for('admin.manage_genres') }}" class="btn-add"">
+            <i class="fas fa-cogs" style="font-size: 24px;"></i> 
+            <span>Manage Genres</span>
+        </a>
+        <table class="resource-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Genre</th>
+                    <th>Type</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resource in resources %}
+                    <tr>
+                        <td>{{ resource.title }}</td>
+                        <td>{{ resource.author }}</td>
+                        <td>{{ resource.genre.genre_name }}</td>
+                        <td>{{ resource.resource_type }}</td>
+                        <td>
+                            <a href="{{ url_for('admin.edit_resource', resource_id=resource.resource_id) }}" class="btn-edit">
+                                <i class="fas fa-pencil-alt"></i> Edit
+                            </a>
+                            <form action="{{ url_for('admin.delete_resource', resource_id=resource.resource_id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn-delete" onclick="return confirm('Are you sure you want to delete this resource?');">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5">No resources found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

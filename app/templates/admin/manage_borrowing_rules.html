@@ -1,0 +1,33 @@
+<!-- templates/admin/manage_borrowing_rules.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Borrowing Rules</h2>
+    <a href="{{ url_for('admin.add_borrowing_rule') }}" class="btn btn-primary">Add Borrowing Rule</a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Resource Type</th>
+                <th>Max Borrow Duration</th>
+                <th>Reminder Intervals</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rule in borrowing_rules %}
+                <tr>
+                    <td>{{ rule.resource_type }}</td>
+                    <td>{{ rule.max_borrow_duration }} days</td>
+                    <td>{{ rule.reminder_intervals | tojson }}</td>
+                    <td>
+                        <a href="{{ url_for('admin.edit_borrowing_rule', rule_id=rule.rule_id) }}" class="btn btn-warning">Edit</a>
+                        <form action="{{ url_for('admin.delete_borrowing_rule', rule_id=rule.rule_id) }}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

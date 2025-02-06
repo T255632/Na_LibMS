@@ -1,0 +1,488 @@
+/* Global Styles */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    background-image: url('/static/background.jpeg');
+    background-size: cover;
+    background-position: center;
+    background-color: rgba(18, 18, 18, 0.8);
+    color: #09b3bf;
+    line-height: 1.6;
+  }
+  
+  /* Responsive Grid */
+  
+  .container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .col-1 {
+    flex-basis: 8.33%;
+  }
+  
+  .col-2 {
+    flex-basis: 16.66%;
+  }
+  
+  .col-3 {
+    flex-basis: 25%;
+  }
+  
+  .col-4 {
+    flex-basis: 33.33%;
+  }
+  
+  .col-5 {
+    flex-basis: 41.66%;
+  }
+  
+  .col-6 {
+    flex-basis: 50%;
+  }
+  
+  .col-7 {
+    flex-basis: 58.33%;
+  }
+  
+  .col-8 {
+    flex-basis: 66.66%;
+  }
+  
+  .col-9 {
+    flex-basis: 75%;
+  }
+  
+  .col-10 {
+    flex-basis: 83.33%;
+  }
+  
+  .col-11 {
+    flex-basis: 91.66%;
+  }
+  
+  .col-12 {
+    flex-basis: 100%;
+  }
+  
+  /* Header and Navigation */
+  
+  header, nav, main, footer {
+    background-color: rgba(30, 30, 30, 0.8);
+    padding: 15px;
+    margin: 10px;
+    border-radius: 8px;
+    border: 1px solid #444;
+  }
+  
+  nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+  }
+  
+  nav a {
+    text-decoration: none;
+    color: #a0a0a0;
+  }
+  
+  nav a:hover {
+    color: #64b5f6;
+  }
+  
+  /* Forms and Inputs */
+  
+  form input, form select, form textarea {
+    display: block;
+    margin: 15px 0;
+    padding: 12px;
+    width: calc(100% - 24px);
+    max-width: 400px;
+    background-color: rgba(66, 66, 66, 0.7);
+    color: #e0e0e0;
+    border: 1px solid #888;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  form input:focus, form select:focus, form textarea:focus {
+    outline: none;
+    border-color: #64b5f6;
+    box-shadow: 0 0 5px rgba(100, 181, 246, 0.5);
+    background-color: rgba(66, 66, 66, 0.9);
+  }
+  
+  form button {
+    background-color: #0d6efd;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  form button:hover {
+    background-color: #0b5ed7;
+  }
+  
+  form button:active {
+    transform: scale(0.98);
+  }
+  
+  /* Table Styles */
+  
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  th {
+    background-color: rgba(30, 30, 30, 0.8);
+    color: #fff;
+  }
+  
+  tr:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  td {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Button Styles */
+  
+  .btn-add {
+    background-color: #17a2b8;
+    color: #fff;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    /* Global Styles */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-image: url('/static/background.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-color: rgba(18, 18, 18, 0.8);
+  color: #09b3bf;
+  line-height: 1.6;
+}
+
+/* Responsive Grid */
+
+.container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.col-1 {
+  flex-basis: 8.33%;
+}
+
+.col-2 {
+  flex-basis: 16.66%;
+}
+
+.col-3 {
+  flex-basis: 25%;
+}
+
+.col-4 {
+  flex-basis: 33.33%;
+}
+
+.col-5 {
+  flex-basis: 41.66%;
+}
+
+.col-6 {
+  flex-basis: 50%;
+}
+
+.col-7 {
+  flex-basis: 58.33%;
+}
+
+.col-8 {
+  flex-basis: 66.66%;
+}
+
+.col-9 {
+  flex-basis: 75%;
+}
+
+.col-10 {
+  flex-basis: 83.33%;
+}
+
+.col-11 {
+  flex-basis: 91.66%;
+}
+
+.col-12 {
+  flex-basis: 100%;
+}
+
+/* Header and Navigation */
+
+header, nav, main, footer {
+  background-color: rgba(30, 30, 30, 0.8);
+  padding: 15px;
+  margin: 10px;
+  border-radius: 8px;
+  border: 1px solid #444;
+}
+
+nav ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  gap: 15px;
+}
+
+nav a {
+  text-decoration: none;
+  color: #a0a0a0;
+}
+
+nav a:hover {
+  color: #64b5f6;
+}
+
+/* Forms and Inputs */
+
+form input, form select, form textarea {
+  display: block;
+  margin: 15px 0;
+  padding: 12px;
+  width: calc(100% - 24px);
+  max-width: 400px;
+  background-color: rgba(66, 66, 66, 0.7);
+  color: #e0e0e0;
+  border: 1px solid #888;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+form input:focus, form select:focus, form textarea:focus {
+  outline: none;
+  border-color: #64b5f6;
+  box-shadow: 0 0 5px rgba(100, 181, 246, 0.5);
+  background-color: rgba(66, 66, 66, 0.9);
+}
+
+form button {
+  background-color: #0d6efd;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+form button:hover {
+  background-color: #0b5ed7;
+}
+
+form button:active {
+  transform: scale(0.98);
+}
+
+/* Table Styles */
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: rgba(30, 30, 30, 0.8);
+  color: #fff;
+}
+
+tr:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+td {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Button Styles */
+
+.btn-add {
+  background-color: #17a2b8;
+  color: #fff;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  padding: 10px 20px;
+  margin: 10px;
+}
+
+.btn-add:hover {
+  background-color: #138496;
+}
+
+.btn-add i {
+  margin-right: 4px;
+}
+
+/* Edit Button Style */
+
+.btn-edit {
+    background-color: #ffc107; /* Warning/Orange color */
+    color: #fff;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn-edit:hover {
+    background-color: #ff9900; /* Darker orange on hover */
+  }
+  
+  .btn-edit i {
+    margin-right: 4px;
+  }
+
+
+/* Delete Button Style */
+
+.btn-delete {
+  background-color: #dc3545; /* Danger/Red color */
+  color: #fff;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  padding: 10px;
+  margin: 5px;
+}
+
+.btn-delete:hover {
+  background-color: #c82333; /* Darker red on hover */
+}
+
+.btn-delete i {
+  margin-right: 4px;
+}
+
+/* Footer Styles */
+
+footer {
+  text-align: center;
+  font-size: 0.9em;
+  color: #757575;
+  padding: 20px;
+  background-color: rgba(30, 30, 30, 0.8);
+  border-radius: 8px;
+  border: 1px solid #444;
+}
+
+/* Responsive Styles */
+
+@media only screen and (max-width: 1200px) {
+  .container {
+    margin: 20px auto;
+  }
+}
+
+@media only screen and (max-width: 992px) {
+  .container {
+    margin: 10px auto;
+  }
+  .row {
+    flex-direction: column;
+  }
+  .col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12 {
+    flex-basis: 100%;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+  header, nav, main, footer {
+    padding: 10px;
+  }
+  table {
+    font-size: 14px;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .container {
+    padding: 5px;
+  }
+  header, nav, main, footer {
+    padding: 5px;
+  }
+  table {
+    font-size: 12px;
+  }
+}}

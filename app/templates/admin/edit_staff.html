@@ -1,0 +1,43 @@
+<!-- edit_staff.html -->
+{% extends "admin/base.html" %}
+
+{% block content %}
+    <div class="edit-staff-form">
+        <h2>Edit Staff: {{ staff.name }}</h2>
+        <form action="{{ url_for('admin.edit_staff', staff_id=staff.staff_id) }}" method="POST">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" class="form-control" value="{{ staff.name }}" required>
+            </div>
+            <div class="form-group">
+                <label for="qualification">Qualification:</label>
+                <input type="text" id="qualification" name="qualification" class="form-control" value="{{ staff.qualification }}">
+            </div>
+            <div class="form-group">
+                <label for="experience">Experience:</label>
+                <input type="text" id="experience" name="experience" class="form-control" value="{{ staff.experience }}">
+            </div>
+            <div class="form-group">
+                <label for="skill_set">Skill Set:</label>
+                <input type="text" id="skill_set" name="skill_set" class="form-control" value="{{ staff.skill_set }}">
+            </div>
+            <div class="form-group">
+                <label for="grade">Grade:</label>
+                <input type="text" id="grade" name="grade" class="form-control" value="{{ staff.grade }}">
+            </div>
+            <div class="form-group">
+                <label for="contact_info">Contact Info:</label>
+                <input type="text" id="contact_info" name="contact_info" class="form-control" value="{{ staff.contact_info }}">
+            </div>
+            <div class="form-group">
+                <label for="role">Role:</label>
+                <select id="role" name="role" class="form-control">
+                    <option value="Admin" {% if staff.role == 'Admin' %}selected{% endif %}>Admin</option>
+                    <option value="Staff" {% if staff.role == 'Staff' %}selected{% endif %}>Staff</option>
+                    <option value="Member" {% if staff.role == 'Member' %}selected{% endif %}>Member</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+{% endblock %}

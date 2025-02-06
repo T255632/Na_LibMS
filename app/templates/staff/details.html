@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Details - NaLib</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header>
+        <h1>NaLib Library Management System</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/genres/">Genres</a></li>
+            <li><a href="/library_resources/">Library Resources</a></li>
+            <li><a href="/members/">Members</a></li>
+            <li><a href="/staff/">Staff</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Staff Details</h2>
+        <p><strong>Name:</strong> {{ staff.name }}</p>
+        <p><strong>Qualification:</strong> {{ staff.qualification }}</p>
+        <p><strong>Experience:</strong> {{ staff.experience }}</p>
+        <p><strong>Skill Set:</strong> {{ staff.skill_set }}</p>
+        <p><strong>Grade:</strong> {{ staff.grade }}</p>
+        <p><strong>Role:</strong> {{ staff.role }}</p>
+        <p><strong>Status:</strong> {{ "Active" if staff.status else "Inactive" }}</p>
+        <h3>Assigned Library Resources</h3>
+        <ul>
+            {% for resource in staff.library_resources %}
+                <li><a href="/library_resources/details/{{ resource.resource_id }}">{{ resource.title }}</a></li>
+            {% endfor %}
+        </ul>
+        <h3>Assigned Lending Transactions</h3>
+        <ul>
+            {% for transaction in staff.lending_transactions %}
+                <li><a href="/lending_transactions/details/{{ transaction.transaction_id }}">{{ transaction.library_resource.title }} ({{ transaction.status }})</a></li>
+            {% endfor %}
+        </ul>
+        <a href="/staff/edit/{{ staff.staff_id }}">Edit Staff</a>
+    </main>
+    <footer>
+        <p>&copy; 2025 NaLib. All rights reserved.</p>
+    </footer>
+</body>
+</html>

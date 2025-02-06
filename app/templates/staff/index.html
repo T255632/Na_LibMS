@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Index - NaLib</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header>
+        <h1>NaLib Library Management System</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/genres/">Genres</a></li>
+            <li><a href="/library_resources/">Library Resources</a></li>
+            <li><a href="/members/">Members</a></li>
+            <li><a href="/staff/">Staff</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Staff</h2>
+        <a href="/staff/create">Add New Staff</a>
+        <ul>
+            {% for staff in staff_list %}
+                <li><a href="/staff/details/{{ staff.staff_id }}">{{ staff.name }} ({{ staff.role }})</a></li>
+            {% endfor %}
+        </ul>
+    </main>
+    <footer>
+        <p>&copy; 2025 NaLib. All rights reserved.</p>
+    </footer>
+</body>
+</html>

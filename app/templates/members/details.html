@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Details - NaLib</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header>
+        <h1>NaLib Library Management System</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/genres/">Genres</a></li>
+            <li><a href="/library_resources/">Library Resources</a></li>
+            <li><a href="/members/">Members</a></li>
+            <li><a href="/staff/">Staff</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Member Details</h2>
+        <p><strong>Name:</strong> {{ member.name }}</p>
+        <p><strong>Membership Number:</strong> {{ member.membership_number }}</p>
+        <p><strong>Email:</strong> {{ member.email }}</p>
+        <p><strong>Phone:</strong> {{ member.phone or "Not Provided" }}</p>
+        <p><strong>Address:</strong> {{ member.address }}</p>
+        <p><strong>Status:</strong> {{ member.status }}</p>
+        <p><strong>Enrolled On:</strong> {{ member.enrolled_on }}</p>
+        <h3>Lending Transactions</h3>
+        <ul>
+            {% for transaction in member.lending_transactions %}
+                <li><a href="/lending_transactions/details/{{ transaction.transaction_id }}">{{ transaction.library_resource.title }} ({{ transaction.status }})</a></li>
+            {% endfor %}
+        </ul>
+        <a href="/members/edit/{{ member.member_id }}">Edit Member</a>
+    </main>
+    <footer>
+        <p>&copy; 2025 NaLib. All rights reserved.</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,43 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+    <div class="edit-resource-form">
+        <h2>Edit Resource</h2>
+        <form action="{{ url_for('admin.edit_resource', resource_id=resource.resource_id) }}" method="POST">
+            <div class="form-group">
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" class="form-control" value="{{ resource.title }}" required>
+            </div>
+            <div class="form-group">
+                <label for="author">Author:</label>
+                <input type="text" id="author" name="author" class="form-control" value="{{ resource.author }}">
+            </div>
+            <div class="form-group">
+                <label for="genre_id">Genre:</label>
+                <select id="genre_id" name="genre_id" class="form-control" disabled>
+                    <option value="{{ resource.genre_id }}" selected>{{ resource.genre.genre_name }}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="resource_type">Resource Type:</label>
+                <select id="resource_type" name="resource_type" class="form-control" required>
+                    <option value="book" {% if resource.resource_type == 'book' %}selected{% endif %}>Book</option>
+                    <option value="newspaper" {% if resource.resource_type == 'newspaper' %}selected{% endif %}>Newspaper</option>
+                    <option value="article" {% if resource.resource_type == 'article' %}selected{% endif %}>Article</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="format">Format:</label>
+                <select id="format" name="format" class="form-control" required>
+                    <option value="hardcopy" {% if resource.format == 'hardcopy' %}selected{% endif %}>Hardcopy</option>
+                    <option value="electronic" {% if resource.format == 'electronic' %}selected{% endif %}>Electronic</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="location">Location:</label>
+                <input type="text" id="location" name="location" class="form-control" value="{{ resource.location }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Update Resource</button>
+        </form>
+    </div>
+{% endblock %}

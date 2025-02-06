@@ -1,0 +1,14 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+    <div class="edit-genre-form">
+        <h2>Edit Genre</h2>
+        <form action="{{ url_for('admin.edit_genre', genre_id=genre.genre_id) }}" method="POST">
+            <div class="form-group">
+                <label for="genre_name">Genre Name:</label>
+                <input type="text" id="genre_name" name="genre_name" class="form-control" value="{{ genre.genre_name }}" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Genre</button>
+        </form>
+    </div>
+{% endblock %}

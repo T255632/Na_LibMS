@@ -1,0 +1,46 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+    <div class="borrowing-rules-management">
+        <h2>Borrowing Rules</h2>
+
+        <a href="{{ url_for('admin.add_borrowing_rule') }}" class="btn-add">
+            <i class="fas fa-plus-circle" style="font-size: 24px;"></i>
+            <span>Add New Rule</span>
+        </a>
+
+        <table class="borrowing-rules-table">
+            <thead>
+                <tr>
+                    <th>Resource Type</th>
+                    <th>Max Borrow Duration (days)</th>
+                    <th>Reminder Intervals</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+{% for rule in borrowing_rules %}
+                    <tr>
+                        <td>{{ rule.resource_type }}</td>
+                        <td>{{ rule.max_borrow_duration }}</td>
+                        <td>{{ rule.reminder_intervals }}</td>
+                        <td>
+                            <a href="{{ url_for('admin.edit_borrowing_rule', rule_id=rule.rule_id) }}" class="btn-edit">
+                                <i class="fas fa-pencil-alt"></i> Edit
+                            </a>
+                            <form action="{{ url_for('admin.delete_borrowing_rule', rule_id=rule.rule_id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn-delete" onclick="return confirm('Are you sure you want to delete this rule?');">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4">No borrowing rules found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

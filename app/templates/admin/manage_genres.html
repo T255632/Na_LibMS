@@ -1,0 +1,39 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+    <div class="genre-management">
+        <h2>Manage Genres</h2>
+        <a href="{{ url_for('admin.add_genre') }}" class="btn-add">
+            <i class="fas fa-plus-circle"></i> Add New Genre
+        </a>
+        <table class="genre-table">
+            <thead>
+                <tr>
+                    <th>Genre Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for genre in genres %}
+                    <tr>
+                        <td>{{ genre.genre_name }}</td>
+                        <td>
+                            <a href="{{ url_for('admin.edit_genre', genre_id=genre.genre_id) }}" class="btn-edit">
+                                <i class="fas fa-pencil-alt"></i> Edit
+                            </a>
+                            <form action="{{ url_for('admin.delete_genre', genre_id=genre.genre_id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn-delete" onclick="return confirm('Are you sure you want to delete this genre?');">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="2">No genres found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

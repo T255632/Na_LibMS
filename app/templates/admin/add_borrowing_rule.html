@@ -1,0 +1,25 @@
+<!-- templates/admin/add_borrowing_rule.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Add Borrowing Rule</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label for="resource_type">Resource Type</label>
+            <select id="resource_type" name="resource_type" class="form-control" required>
+                <option value="book">Book</option>
+                <option value="newspaper">Newspaper</option>
+                <option value="article">Article</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="max_borrow_duration">Max Borrow Duration (days)</label>
+            <input type="number" id="max_borrow_duration" name="max_borrow_duration" class="form-control" required min="1">
+        </div>
+        <div class="form-group">
+            <label for="reminder_intervals">Reminder Intervals</label>
+            <input type="text" id="reminder_intervals" name="reminder_intervals" class="form-control" placeholder="Enter intervals (e.g., 1,7,14)">
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+{% endblock %}

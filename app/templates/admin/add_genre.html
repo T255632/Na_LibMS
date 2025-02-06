@@ -1,0 +1,14 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+    <div class="add-genre-form">
+        <h2>Add New Genre</h2>
+        <form action="{{ url_for('admin.add_genre') }}" method="POST">
+            <div class="form-group">
+                <label for="genre_name">Genre Name:</label>
+                <input type="text" id="genre_name" name="genre_name" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Genre</button>
+        </form>
+    </div>
+{% endblock %}

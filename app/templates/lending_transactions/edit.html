@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Lending Transaction - NaLib</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header>
+        <h1>NaLib Library Management System</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/genres/">Genres</a></li>
+            <li><a href="/library_resources/">Library Resources</a></li>
+            <li><a href="/members/">Members</a></li>
+            <li><a href="/staff/">Staff</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Edit Lending Transaction</h2>
+        <form method="POST" action="/lending_transactions/edit/{{ transaction.transaction_id }}">
+            <div>
+                <label for="member">Member</label>
+                <select id="member" name="member_id">
+                    {% for member in members %}
+                        <option value="{{ member.member_id }}" {% if member.member_id == transaction.member_id %}selected{% endif %}>{{ member.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="resource">Library Resource</label>
+                <select id="resource" name="resource_id">
+                    {% for resource in resources %}
+                        <option value="{{ resource.resource_id }}" {% if resource.resource_id == transaction.resource_id %}selected{% endif %}>{{ resource.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="due_date">Due Date</label>
+                <input type="datetime-local" id="due_date" name="due_date" value="{{ transaction.due_date }}" required>
+            </div>
+            <div>
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    <option value="borrowed" {% if transaction.status == 'borrowed' %}selected{% endif %}>Borrowed</option>
+                    <option value="overdue" {% if transaction.status == 'overdue' %}selected{% endif %}>Overdue</option>
+                    <option value="returned" {% if transaction.status == 'returned' %}selected{% endif %}>Returned</option>
+                    <option value="damaged" {% if transaction.status == 'damaged' %}selected{% endif %}>Damaged</option>
+                    <option value="lost" {% if transaction.status == 'lost' %}selected{% endif %}>Lost</option>
+                </select>
+            </div>
+            <div>
+                <label for="condition_on_return">Condition on Return</label>
+                <select id="condition_on_return" name="condition_on_return">
+                    <option value="good" {% if transaction.condition_on_return == 'good' %}selected{% endif %}>Good</option>
+                    <option value="damaged" {% if transaction.condition_on_return == 'damaged' %}selected{% endif %}>Damaged</option>
+                    <option value="lost" {% if transaction.condition_on_return == 'lost' %}selected{% endif %}>Lost</option>
+                </select>
+            </div>
+            <button type="submit">Update Transaction</button>
+        </form>
+    </main>
+    <footer>
+        <p>&copy; 2025 NaLib. All rights reserved.</p>
+    </footer>
+</body>
+</html>
