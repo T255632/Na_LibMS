@@ -1,13 +1,14 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import json
 from flask_jwt_extended import JWTManager
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from sqlalchemy.exc import ProgrammingError
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from models import db
 from models import init_db
-from models.staff import Staff
 from dotenv import load_dotenv
 import os
+from triggers.generate_admin_notifications import create_notification_triggers, DuplicateObject
 
 # Load environment variables from .env file
 load_dotenv()
@@ -45,30 +46,26 @@ init_db(app)
 # Register Blueprints
 init_app(app)  # <--- Add this line
 
+# Create notification triggers (within an app context)
+with app.app_context():
+    try:
+        create_notification_triggers()
+    except DuplicateObject as e:
+        # Handle DuplicateObject (trigger already exists)
+        print(f"Duplicate trigger error: {e}")
+    except ProgrammingError as e:
+        # Handle other SQL programming errors
+        print(f"Programming error: {e}")
+    except Exception as e:
+        # Catch all other exceptions
+        print(f"An unexpected error occurred: {e}")
+
+        
+
 # Define a route for the index page
 @app.route('/')
 def index():
     return render_template('index.html')
-
-@app.route('/api/get_staff_members', methods=['GET'])
-@jwt_required()
-def get_staff_members():
-    current_user = json.loads(get_jwt_identity())
-    print("Current User:", current_user)  # Debugging line
-
-    if current_user['role'] != 'Admin':
-        print("Unauthorized Access Attempt:", current_user)
-        return jsonify({'message': 'Unauthorized'}), 401
-
-    staff_members = Staff.query.all()
-
-    staff_data = [{
-        'staff_id': staff.staff_id,
-        'name': staff.name,
-        'role': staff.role
-    } for staff in staff_members]
-
-    return jsonify({'staff_members': staff_data})
 
 
 

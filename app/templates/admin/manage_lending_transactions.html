@@ -1,0 +1,42 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+  <div class="transaction-management">
+    <h2>Lending Transactions</h2><
+    
+    </a>
+    <table class="transaction-table">
+      <thead>
+        <tr>
+          <th>Transaction ID</th>
+          <th>Member</th>
+          <th>Resource</th>
+          <th>Status</th>
+          <th>Due Date</th>
+          <th>Staff</th>
+          
+        </tr>
+      </thead>
+      <tbody>
+        {% for transaction in lending_transactions %}
+          <tr>
+            <td>{{ transaction.id }}</td>
+            <td>{{ transaction.member.name }}</td>
+            <td>{{ transaction.resource.title }}</td>
+            <td>{{ transaction.status }}</td>
+            <td>{{ transaction.due_date }}</td>
+            <td>{{ transaction.staff.name }}</td>
+           
+              
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="7">No transactions found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

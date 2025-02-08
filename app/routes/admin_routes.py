@@ -1,6 +1,8 @@
-from flask import Blueprint, render_template, redirect, request, url_for
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask import Blueprint, render_template, redirect, request, url_for, jsonify
+from sqlalchemy import text
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from werkzeug.security import generate_password_hash
+from datetime import datetime, timedelta
 import json 
 from models import db
 from models.staff import Staff
@@ -10,24 +12,51 @@ from models.library_resources import LibraryResource
 from models.lending_transactions import LendingTransaction
 from models.user_roles import UserRole
 from models.borrowing_rules import BorrowingRule
+from models.notifications import Notification
 
 # Create the Blueprint for Admin Routes
 admin_bp = Blueprint('admin', __name__, template_folder='../templates/admin')
 
-# Helper function to check admin role
-def is_admin():
-    current_user = json.loads(get_jwt_identity())
-    return current_user['role'] == 'Admin'
 
-# Admin Dashboard Route
+def is_admin():
+    jwt_data = get_jwt()
+    return jwt_data.get('role') == 'Admin'
+
+
 @admin_bp.route('/admin_dashboard')
 @jwt_required()
 def admin_dashboard():
     if not is_admin():
-        return redirect('/')  # Redirect to home or an unauthorized page
+        return redirect('/')
 
-    staff_members = Staff.query.all()
-    return render_template('admin/index.html', staff_members=staff_members)
+    # Execute the raw SQL query for the report data
+    query = text("SELECT * FROM library_reports")
+    result = db.session.execute(query).fetchone()
+
+    # Check if result exists to avoid errors
+    if not result:
+        return render_template('admin/dashboard.html', error="Failed to load report data.")
+
+    # Extract data from the result (ensure column names match your view definition)
+    total_resources = result.total_resources
+    total_members = result.total_members
+    total_borrowed_resources = result.total_borrowed_resources
+    overdue_transactions = result.overdue_transactions
+    total_genres = result.total_genres
+    overdue_returns = result.overdue_returns
+    avg_borrowed_per_member = result.avg_borrowed_per_member
+
+    # Render the dashboard template with the data
+    return render_template(
+        'admin/dashboard.html', 
+        total_resources=total_resources,
+        total_members=total_members,
+        total_borrowed_resources=total_borrowed_resources,
+        overdue_transactions=overdue_transactions,
+        total_genres=total_genres,
+        overdue_returns=overdue_returns,
+        avg_borrowed_per_member=avg_borrowed_per_member
+    )
 
 # Staff Management Route
 @admin_bp.route('/staff_management')
@@ -152,24 +181,10 @@ def borrowing_rules():
     rules = UserRole.query.all()  # Assuming borrowing rules are linked with roles
     return render_template('admin/borrowing_rules.html', rules=rules)
 
-# Lending Transactions Management Route
-@admin_bp.route('/lending_transactions')
-@jwt_required()
-def lending_transactions():
-    if not is_admin():
-        return redirect('/')
 
-    transactions = LendingTransaction.query.all()
-    return render_template('admin/lending_transactions.html', transactions=transactions)
 
-# Password Policy Configuration Route
-@admin_bp.route('/password_policy')
-@jwt_required()
-def password_policy():
-    if not is_admin():
-        return redirect('/')
 
-    return render_template('admin/password_policy.html')
+
 
 
 @admin_bp.route('/add_staff', methods=['GET', 'POST'])
@@ -498,3 +513,82 @@ def delete_borrowing_rule(rule_id):
     db.session.commit()
     
     return redirect(url_for('admin.manage_borrowing_rules'))  # Redirect to borrowing rules management page
+
+
+
+# Lending Transactions Management Route
+@admin_bp.route('/manage_lending_transactions')
+@jwt_required()
+def manage_lending_transactions():
+    if not is_admin():
+        return redirect('/')
+    
+    lending_transactions = LendingTransaction.query.all()
+    return render_template('admin/manage_lending_transactions.html', lending_transactions=lending_transactions)
+
+# Add Lending Transaction Route
+@admin_bp.route('/add_lending_transaction', methods=['GET', 'POST'])
+@jwt_required()
+def add_lending_transaction():
+    if not is_admin():
+        return redirect('/')
+
+    if request.method == 'POST':
+        member_id = request.form['member_id']
+        resource_id = request.form['resource_id']
+        staff_id = request.form['staff_id']
+
+        # Get the resource type from library_resources table
+        resource = LibraryResource.query.get(resource_id)
+        if not resource:
+            return "Resource not found", 404
+
+        # Get the max borrow duration from borrowing_rules table based on resource_type
+        borrowing_rule = BorrowingRule.query.filter_by(resource_type=resource.resource_type).first()
+        if not borrowing_rule:
+            return "Borrowing rule not found", 404
+
+        max_borrow_duration = borrowing_rule.max_borrow_duration
+        
+        # Calculate the due date dynamically by adding max_borrow_duration to today's date
+        due_date = datetime.now() + timedelta(days=max_borrow_duration)
+
+        # Create new lending transaction
+        new_transaction = LendingTransaction(
+            member_id=member_id,
+            resource_id=resource_id,
+            due_date=due_date,
+            status='borrowed',
+            staff_id=staff_id
+        )
+
+        db.session.add(new_transaction)
+        db.session.commit()
+
+        return redirect(url_for('admin.manage_lending_transactions'))
+
+    members = Member.query.all()
+    resources = LibraryResource.query.all()
+    staff = Staff.query.all()
+    return render_template('admin/create_lending_transactions.html', members=members, resources=resources, staff=staff)
+
+
+# Notifications Route
+@admin_bp.route('/notifications')
+def admin_notifications():
+    # Fetch all Admin notifications
+    notifications = Notification.query.filter_by(role='Admin').order_by(Notification.created_at.desc()).all()
+
+    # Mark unseen notifications as seen
+    unseen_notifications = Notification.query.filter_by(role='Admin', seen=False).all()
+    for notification in unseen_notifications:
+        notification.seen = True
+    db.session.commit()
+
+    return render_template('admin/notifications.html', notifications=notifications)
+
+# API Route to Get Unseen Notification Count
+@admin_bp.route('/notifications/unseen_count')
+def unseen_notification_count():
+    count = Notification.query.filter_by(role='Admin', seen=False).count()
+    return jsonify({'unseen_count': count})

@@ -1,4 +1,3 @@
-# app/models/staff.py
 from sqlalchemy import Column, Integer, String, Text, JSON, Boolean, CheckConstraint
 from sqlalchemy.orm import relationship
 from . import db
@@ -19,6 +18,9 @@ class Staff(db.Model):
     library_resources = relationship("LibraryResource", back_populates="staff")
     lending_transactions = relationship("LendingTransaction", back_populates="staff")
     user_role = relationship("UserRole", back_populates="staff", uselist=False)
+
+    # Relationship with notifications
+    notifications = relationship("Notification", back_populates="staff")
 
     __table_args__ = (
         CheckConstraint("role IN ('Admin', 'Staff', 'Member')", name='check_role_valid'),

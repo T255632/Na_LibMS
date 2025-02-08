@@ -1,0 +1,17 @@
+<form method="POST">
+    <label for="member_id">Select Member:</label>
+    <select name="member_id" id="member_id" required>
+        {% for member in members %}
+            <option value="{{ member.member_id }}">{{ member.name }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="resource_id">Select Resource:</label>
+    <select name="resource_id" id="resource_id" required>
+        {% for resource in resources %}
+            <option value="{{ resource.resource_id }}">{{ resource.title }}</option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Create Lending Transaction</button>
+</form>

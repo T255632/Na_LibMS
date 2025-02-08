@@ -1,0 +1,28 @@
+{% extends 'staff/base.html' %}
+
+{% block content %}
+    <h2>Welcome, {{ staff_member.name }}!</h2>
+    <div class="card mb-3">
+        <div class="card-header">
+            <h4>Your Dashboard</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>Role:</strong> {{ staff_member.role }}</p>
+            <p><strong>Qualification:</strong> {{ staff_member.qualification }}</p>
+            <p><strong>Experience:</strong> {{ staff_member.experience }}</p>
+            <p><strong>Status:</strong> {{ 'Active' if staff_member.status else 'Inactive' }}</p>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <h4>Your Recent Activity</h4>
+        </div>
+        <div class="card-body">
+            <!-- Display staff member's recent activity (e.g., lending transactions, resources managed, etc.) -->
+            <p>No recent activity yet. Check back later!</p>
+        </div>
+    </div>
+
+    <a href="{{ url_for('staff.edit_profile') }}" class="btn btn-primary">Edit Profile</a>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<div class="dashboard">
+    <section class="widget">
+        <h3>Library Resources</h3>
+        <div class="card">
+            <h4>Total Resources</h4>
+            <p>{{ total_resources }}</p>
+        </div>
+        <div class="card">
+            <h4>Total Genres</h4>
+            <p>{{ total_genres }}</p>
+        </div>
+    </section>
+
+    <section class="widget">
+        <h3>Members</h3>
+        <div class="card">
+            <h4>Total Members</h4>
+            <p>{{ total_members }}</p>
+        </div>
+    </section>
+
+    <section class="widget">
+        <h3>Lending Transactions</h3>
+        <div class="card">
+            <h4>Total Borrowed Resources</h4>
+            <p>{{ total_borrowed_resources }}</p>
+        </div>
+        <div class="card">
+            <h4>Average Borrowed Items per Member</h4>
+            <p>{{ avg_borrowed_per_member }}</p>
+        </div>
+    </section>
+
+    <section class="widget">
+        <h3>Overdue Transactions</h3>
+        <div class="card">
+            <h4>Overdue Transactions</h4>
+            <p>{{ overdue_transactions }}</p>
+        </div>
+        <div class="card">
+            <h4>Overdue Returns</h4>
+            <p>{{ overdue_returns }}</p>
+        </div>
+    </section>
+</div>
+{% endblock %}

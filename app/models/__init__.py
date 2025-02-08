@@ -11,6 +11,7 @@ from .members import Member
 from .lending_transactions import LendingTransaction
 from .user_roles import UserRole
 from .password_policies import PasswordPolicy
+from .notifications import Notification
 
 
 def init_db(app):

@@ -1,4 +1,3 @@
-# app/models/members.py
 from sqlalchemy import Column, Integer, String, JSON, TIMESTAMP, CheckConstraint
 from sqlalchemy.orm import relationship
 from . import db
@@ -18,6 +17,9 @@ class Member(db.Model):
     borrowing_behavior = Column(JSON)
 
     lending_transactions = relationship("LendingTransaction", back_populates="member")
+
+    # Relationship with notifications
+    notifications = relationship("Notification", back_populates="member")
 
     __table_args__ = (
         CheckConstraint("status IN ('active', 'suspended', 'deactivated')", name='check_status_valid'),

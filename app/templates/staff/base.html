@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>Staff Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
     <!-- Include the Navbar -->
-    {% include 'admin/navbar.html' %}
+    {% include 'staff/staff_navbar.html' %}
 
     <div class="container">
-        <header>
-            <h1>Admin Dashboard</h1>
+        <header class="dashboard-header">
+            <h1>Staff Dashboard</h1>
         </header>
 
         <main>
+            
             {% block content %}
             <!-- Main content for each page will be injected here -->
             {% endblock %}
@@ -27,14 +28,5 @@
         </footer>
     </div>
 
-    <script>
-        // Get the JWT token from cookies
-        const getAccessToken = () => {
-            const cookie = document.cookie.split('; ').find(row => row.startsWith('access_token='));
-            return cookie ? cookie.split('=')[1] : null;
-        };
-
-        
-    </script>
 </body>
 </html>

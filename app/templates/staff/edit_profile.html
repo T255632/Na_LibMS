@@ -1,0 +1,43 @@
+<!-- templates/staff/edit_profile.html -->
+
+{% extends "staff/base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Edit Profile</h1>
+    <form method="POST">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ staff_member.name }}" required>
+        </div>
+        <div class="form-group">
+            <label for="qualification">Qualification</label>
+            <input type="text" class="form-control" id="qualification" name="qualification" value="{{ staff_member.qualification }}">
+        </div>
+        <div class="form-group">
+            <label for="experience">Experience</label>
+            <input type="text" class="form-control" id="experience" name="experience" value="{{ staff_member.experience }}">
+        </div>
+        <div class="form-group">
+            <label for="skill_set">Skill Set</label>
+            <input type="text" class="form-control" id="skill_set" name="skill_set" value="{{ staff_member.skill_set }}">
+        </div>
+        <div class="form-group">
+            <label for="grade">Grade</label>
+            <input type="text" class="form-control" id="grade" name="grade" value="{{ staff_member.grade }}">
+        </div>
+        <div class="form-group">
+            <label for="contact_info">Contact Info (JSON format)</label>
+            <textarea class="form-control" id="contact_info" name="contact_info">{{ staff_member.contact_info | tojson }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="status">Status</label>
+            <select class="form-control" id="status" name="status">
+                <option value="true" {% if staff_member.status %}selected{% endif %}>Active</option>
+                <option value="false" {% if not staff_member.status %}selected{% endif %}>Inactive</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+</div>
+{% endblock %}

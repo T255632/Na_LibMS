@@ -1,0 +1,36 @@
+<!-- templates/staff/profile.html -->
+
+{% extends "staff/base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Staff Profile</h1>
+    <div class="profile-card">
+        <h2>{{ staff_member.name }}</h2>
+        <p><strong>Role:</strong> {{ staff_member.role }}</p>
+        <p><strong>Qualification:</strong> {{ staff_member.qualification }}</p>
+        <p><strong>Experience:</strong> {{ staff_member.experience }}</p>
+        <p><strong>Skill Set:</strong> {{ staff_member.skill_set }}</p>
+        <p><strong>Grade:</strong> {{ staff_member.grade }}</p>
+        <p><strong>Status:</strong> 
+            {% if staff_member.status %}
+                Active
+            {% else %}
+                Inactive
+            {% endif %}
+        </p>
+        <p><strong>Contact Information:</strong></p>
+        <ul>
+            {% if staff_member.contact_info and staff_member.contact_info.items %}
+                {% for key, value in staff_member.contact_info.items() %}
+                    <li><strong>{{ key }}:</strong> {{ value }}</li>
+                {% endfor %}
+            {% else %}
+                <li>No contact information available.</li>
+            {% endif %}
+        </ul>
+
+        <a href="{{ url_for('staff.edit_profile') }}" class="btn btn-primary">Edit Profile</a>
+    </div>
+</div>
+{% endblock %}

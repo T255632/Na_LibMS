@@ -1,92 +1,129 @@
+import logging
 from flask import Blueprint, request, redirect, render_template, make_response
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-import json
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt, get_jwt_identity
 from models import db
 from models.user_roles import UserRole 
 from models.staff import Staff
 from models.members import Member
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 # Create the Blueprint
 auth_bp = Blueprint('auth', __name__, template_folder='../templates/auth')
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        username = request.form.get('username')
+        password = request.form.get('password')
 
-        # Check in staff first
-        user = UserRole.query.join(Staff).filter(Staff.name == username).first()
+        logger.debug(f"Login attempt for username: {username}")
 
-        if user and check_password_hash(user.password_hash, password):
-            access_token = create_access_token(identity=json.dumps({
-            'user_id': user.user_id,
-            'role': user.role,
-            'staff_id': user.staff_id
-        }))
+        # Check for staff (Admin or Staff)
+        staff = Staff.query.filter_by(name=username).first()
+        if staff:
+            logger.debug(f"Staff found: {staff.name}")
+        else:
+            logger.warning(f"No staff found with username: {username}")
 
-            response = make_response(redirect(f'/{user.role.lower()}/{user.role.lower()}_dashboard'))
-            response.set_cookie('access_token', access_token, httponly=True, secure=False)
+        user_role = UserRole.query.filter_by(staff_id=staff.staff_id).first() if staff else None
+        if user_role:
+            logger.debug(f"User role found for {username}: {user_role.role}")
+        else:
+            logger.warning(f"No user role found for staff: {username}")
+
+        if user_role and check_password_hash(user_role.password_hash, password):
+            logger.info(f"Login successful for staff: {username}")
+            access_token = create_access_token(identity=str(staff.staff_id), additional_claims={
+                'user_id': user_role.user_id,
+                'role': user_role.role,
+                'staff_id': str(staff.staff_id)
+            })
+            dashboard_route = '/admin/admin_dashboard' if user_role.role == 'Admin' else '/staff/dashboard'
+            response = make_response(redirect(dashboard_route))
+            response.set_cookie('access_token', access_token, httponly=True, secure=False)  # Use secure=True in production
             return response
+        else:
+            logger.warning(f"Invalid credentials for staff: {username}")
 
         # Fallback to Member
-        member = Member.query.filter(Member.name == username).first()
+        member = Member.query.filter_by(name=username).first()
+        if member:
+            logger.debug(f"Member found: {member.name}")
+        else:
+            logger.warning(f"No member found with username: {username}")
+
         if member and check_password_hash(member.password_hash, password):
-            access_token = create_access_token(identity={
-                'member_id': member.member_id,
+            logger.info(f"Login successful for member: {username}")
+            access_token = create_access_token(identity=str(member.member_id), additional_claims={
+                'member_id': str(member.member_id),
                 'role': 'Member'
             })
-
             response = make_response(redirect('/member/member_dashboard'))
-            response.set_cookie('access_token', access_token, httponly=True, secure=True)  # set secure=True in production
+            response.set_cookie('access_token', access_token, httponly=True, secure=False)
             return response
+        else:
+            logger.warning(f"Invalid credentials for member: {username}")
 
-        return render_template('login.html', error='Invalid credentials')
+        return render_template('auth/login.html', error='Invalid credentials')
 
-    return render_template('login.html')
-
-
+    return render_template('auth/login.html')
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        # role = request.form['role']  # Admin, Staff, Member
-        role = 'Member'
+        username = request.form.get('username')
+        password = request.form.get('password')
+        role = 'Member'  # Default role
 
-        # Hash the password
+        logger.debug(f"Registration attempt for username: {username} with role: {role}")
+
+        if not username or not password:
+            logger.warning("Username or password missing.")
+            return render_template('auth/register.html', error='Please fill in all fields.')
+
+        # Check if username already exists
+        if Staff.query.filter_by(name=username).first() or Member.query.filter_by(name=username).first():
+            logger.warning(f"Username already exists: {username}")
+            return render_template('auth/register.html', error='Username already exists.')
+
         password_hash = generate_password_hash(password)
+        logger.debug(f"Generated password hash for user: {username}")
 
         if role in ['Admin', 'Staff']:
             new_staff = Staff(name=username, role=role)
             db.session.add(new_staff)
             db.session.commit()
+            logger.info(f"New staff created: {username}")
 
             new_user = UserRole(role=role, password_hash=password_hash, staff_id=new_staff.staff_id)
             db.session.add(new_user)
-
         elif role == 'Member':
             new_member = Member(name=username, password_hash=password_hash)
             db.session.add(new_member)
+            logger.info(f"New member created: {username}")
 
         db.session.commit()
         return redirect('/auth/login')
 
-    return render_template('register.html')
+    return render_template('auth/register.html')
 
 @auth_bp.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
-        email = request.form['email']
-        # Add logic to handle password recovery
-        return render_template('forgot_password.html', message='Password reset instructions sent.')
-    return render_template('forgot_password.html')
-
+        email = request.form.get('email')
+        logger.debug(f"Password reset request for email: {email}")
+        # Add password recovery logic here
+        return render_template('auth/forgot_password.html', message='Password reset instructions sent.')
+    return render_template('auth/forgot_password.html')
 
 @auth_bp.route('/logout')
 @jwt_required()
 def logout():
+    logger.debug(f"User logging out. JWT identity: {get_jwt_identity()}")
     response = make_response(redirect('/auth/login'))
     response.delete_cookie('access_token')
     return response

@@ -1,0 +1,45 @@
+{% extends "staff/base.html" %}
+
+{% block content %}
+    <div class="resource-management">
+        <h2>Library Resources</h2>
+        <a href="{{ url_for('staff.add_resource') }}" class="btn-add">
+            <i class="fas fa-plus-circle" style="font-size: 24px;"></i> 
+            <span>Add New Resource</span>
+        </a>
+        <a href="{{ url_for('staff.manage_genres') }}" class="btn-add"">
+            <i class="fas fa-cogs" style="font-size: 24px;"></i> 
+            <span>Manage Genres</span>
+        </a>
+        <table class="resource-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Genre</th>
+                    <th>Type</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resource in resources %}
+                    <tr>
+                        <td>{{ resource.title }}</td>
+                        <td>{{ resource.author }}</td>
+                        <td>{{ resource.genre.genre_name }}</td>
+                        <td>{{ resource.resource_type }}</td>
+                        <td>
+                            <a href="{{ url_for('staff.edit_resource', resource_id=resource.resource_id) }}" class="btn-edit">
+                                <i class="fas fa-pencil-alt"></i> Edit
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5">No resources found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
