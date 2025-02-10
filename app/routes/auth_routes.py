@@ -151,3 +151,6 @@ def logout():
     except Exception:
         # Redirect to the homepage if the token is missing
         return redirect('/')
+
+
+

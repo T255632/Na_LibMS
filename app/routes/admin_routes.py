@@ -683,6 +683,8 @@ def restore_page():
     if not is_admin():
         return redirect('/')
     return render_template('admin/restore.html')
+
+
 @admin_bp.route('/restore', methods=['POST'])
 @jwt_required()
 def restore_database():
@@ -721,3 +723,4 @@ def restore_database():
     except Exception as ex:
         print(f"Unexpected error: {ex}")
         return jsonify({"error": f"An unexpected error occurred: {ex}"}), 500
+

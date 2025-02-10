@@ -177,4 +177,3 @@ def create_notification_triggers():
         print(f"Error creating triggers: {e}")
         db.session.rollback()  # Rollback in case of error
 
-

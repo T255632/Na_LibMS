@@ -1,7 +1,8 @@
 cat > .gitignore <<EOF
 .venv         # Ignore the virtual environment at the project root
 app/.venv     # Ignore any venv inside the app directory (redundant but good practice)
-.env          # VERY IMPORTANT: Ignore environment files
+.env
+app/.env        # VERY IMPORTANT: Ignore environment files
 __pycache__/  # Ignore Python cache directories
 app/__pycache__/ # Ignore Python cache directory within app
 *.pyc         # Ignore compiled Python files
