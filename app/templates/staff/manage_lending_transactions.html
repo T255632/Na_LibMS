@@ -1,41 +1,26 @@
-{% extends "staff/base.html" %}
-
-{% block content %}
-  <div class="transaction-management">
-    <h2>Lending Transactions</h2>
-    
-    <!-- Link to add a new lending transaction with a circular icon -->
-    <a href="{{ url_for('staff.lend_book') }}" class="btn-circle">
-      <i class="fas fa-plus">Lend Book</i>
-    </a>
-
-    <table class="transaction-table">
-      <thead>
-        <tr>
-          <th>Transaction ID</th>
-          <th>Member</th>
-          <th>Resource</th>
-          <th>Status</th>
-          <th>Due Date</th>
-          <th>Staff</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for transaction in lending_transactions %}
-          <tr>
-            <td>{{ transaction.id }}</td>
-            <td>{{ transaction.member.name }}</td>
-            <td>{{ transaction.resource.title }}</td>
-            <td>{{ transaction.status }}</td>
-            <td>{{ transaction.due_date }}</td>
-            <td>{{ transaction.staff.name }}</td>
-          </tr>
-        {% else %}
-          <tr>
-            <td colspan="7">No transactions found.</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+<form action="{{ url_for('staff.create_lending_transaction') }}" method="POST">
+  <div class="form-group">
+      <label for="member_id">Select Member:</label>
+      <select name="member_id" id="member_id" class="form-control" required>
+          {% for member in members %}
+              <option value="{{ member.member_id }}">{{ member.name }}</option>
+          {% endfor %}
+      </select>
   </div>
-{% endblock %}
+
+  <div class="form-group">
+      <label for="resource_id">Select Resource:</label>
+      <select name="resource_id" id="resource_id" class="form-control" required>
+          {% for resource in resources %}
+              <option value="{{ resource.resource_id }}">{{ resource.title }}</option>
+          {% endfor %}
+      </select>
+  </div>
+
+  <div class="form-group">
+      <label for="due_date">Due Date:</label>
+      <input type="date" id="due_date" name="due_date" class="form-control" required>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Create Lending Transaction</button>
+</form>

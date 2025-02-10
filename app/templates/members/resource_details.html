@@ -1,0 +1,14 @@
+{% extends 'members/base.html' %}
+
+{% block content %}
+  <h2>{{ resource.title }}</h2>
+  <p><strong>Author:</strong> {{ resource.author }}</p>
+  <p><strong>Type:</strong> {{ resource.resource_type }}</p>
+  <p><strong>Format:</strong> {{ resource.format }}</p>
+  <p><strong>Location:</strong> {{ resource.location }}</p>
+  <p><strong>Available Items:</strong> {{ resource.items }}</p>
+  <p><strong>Added On:</strong> {{ resource.added_on.strftime('%d %b, %Y') }}</p>
+  
+  <!-- Optionally add a back link -->
+  <a href="{{ url_for('members.browse_resources') }}">Back to Resources</a>
+{% endblock %}

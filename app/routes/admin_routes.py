@@ -1,9 +1,12 @@
-from flask import Blueprint, render_template, redirect, request, url_for, jsonify
+import os
+from flask import Blueprint, render_template, redirect, request, url_for, jsonify, send_file
 from sqlalchemy import text
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from werkzeug.security import generate_password_hash
 from datetime import datetime, timedelta
 import json 
+from subprocess import run, CalledProcessError
+from dotenv import load_dotenv
 from models import db
 from models.staff import Staff
 from models.members import Member
@@ -17,6 +20,16 @@ from models.notifications import Notification
 # Create the Blueprint for Admin Routes
 admin_bp = Blueprint('admin', __name__, template_folder='../templates/admin')
 
+
+
+# PostgreSQL container details from environment variables
+DB_CONTAINER = os.getenv('DB_CONTAINER')
+DB_USER = os.getenv('DB_USER')
+DB_NAME = os.getenv('DB_NAME')
+BACKUP_DIR = os.getenv('BACKUP_DIR')
+
+# Ensure backup directory exists
+os.makedirs(BACKUP_DIR, exist_ok=True)
 
 def is_admin():
     jwt_data = get_jwt()
@@ -592,3 +605,119 @@ def admin_notifications():
 def unseen_notification_count():
     count = Notification.query.filter_by(role='Admin', seen=False).count()
     return jsonify({'unseen_count': count})
+
+@admin_bp.route('/backup', methods=['GET'])
+@jwt_required()
+def backup_page():
+    if not is_admin():
+        return redirect('/')
+    return render_template('admin/backup.html')
+
+
+
+
+# Database configuration from .env
+DB_USER = os.getenv('POSTGRES_USER')
+DB_PASSWORD = os.getenv('POSTGRES_PASSWORD')
+DB_NAME = os.getenv('POSTGRES_DB')
+DB_HOST = os.getenv('POSTGRES_HOST', 'localhost')
+DB_PORT = os.getenv('POSTGRES_PORT', '5432')
+BACKUP_DIR = os.getenv('BACKUP_DIR', 'database')
+
+@admin_bp.route('/backup', methods=['POST'])
+@jwt_required()
+def backup_database():
+    if not is_admin():
+        return redirect('/')
+
+    # Use BACKUP_DIR from .env or form data
+    backup_dir = request.form.get('backup_dir', BACKUP_DIR)
+    abs_backup_dir = os.path.abspath(backup_dir)
+
+    # Debugging logs
+    print(f"Requested Backup Directory: {backup_dir}")
+    print(f"Absolute Path: {abs_backup_dir}")
+    print(f"Directory Exists: {os.path.isdir(abs_backup_dir)}")
+
+    if not os.path.isdir(abs_backup_dir):
+        return jsonify({"error": "Invalid backup directory."}), 400
+
+    backup_filename = f"nalib_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.sql"
+    backup_file = os.path.join(abs_backup_dir, backup_filename)
+
+    print(f"Backup file path: {backup_file}")
+
+    print(f"DB_USER: {DB_USER}")
+    print(f"DB_NAME: {DB_NAME}")
+
+    pg_dump_path = "/usr/bin/pg_dump"  # Or the actual path you found with `which pg_dump`
+
+    # Run the pg_dump inside Docker container
+    command = [
+        'docker', 'exec', DB_CONTAINER,
+        pg_dump_path, '-U', DB_USER, '-d', DB_NAME, '-F', 'c', '-b', '-v', '-f', f"/tmp/{backup_filename}"
+    ]
+
+    try:
+        # Run the backup command inside Docker
+        run(command, check=True, env={**os.environ, 'PGPASSWORD': DB_PASSWORD})
+
+        # Copy backup file from container to host system
+        run(['docker', 'cp', f"{DB_CONTAINER}:/tmp/{backup_filename}", backup_file], check=True)
+
+        return send_file(backup_file, as_attachment=True)
+
+    except CalledProcessError as e:
+        print(f"Backup failed: {e}")
+        return jsonify({"error": f"Backup failed: {e}"}), 500
+
+    except Exception as ex:
+        print(f"Unexpected error: {ex}")
+        return jsonify({"error": f"An unexpected error occurred: {ex}"}), 500
+
+
+
+@admin_bp.route('/restore', methods=['GET'])
+@jwt_required()
+def restore_page():
+    if not is_admin():
+        return redirect('/')
+    return render_template('admin/restore.html')
+@admin_bp.route('/restore', methods=['POST'])
+@jwt_required()
+def restore_database():
+    if not is_admin():
+        return redirect('/')
+
+    if 'backup_file' not in request.files:
+        return jsonify({"error": "No file uploaded."}), 400
+
+    backup_file = request.files['backup_file']
+    backup_filename = backup_file.filename
+    backup_path = os.path.join('/tmp', f"restore_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{backup_filename}")
+
+    # Save uploaded file to /tmp
+    backup_file.save(backup_path)
+
+    try:
+        # Copy the backup file into the container
+        run(['docker', 'cp', backup_path, f"{DB_CONTAINER}:/tmp/{backup_filename}"], check=True)
+
+        # Run the restore command inside the Docker container
+        run([
+            'docker', 'exec', DB_CONTAINER,
+            'pg_restore', '-U', DB_USER, '-d', DB_NAME, '-c', f"/tmp/{backup_filename}"
+        ], check=True)
+
+        # Optionally, delete the file after restore
+        os.remove(backup_path)
+
+        return jsonify({"message": "Database restored successfully."}), 200
+
+    except CalledProcessError as e:
+        print(f"Restore failed: {e}")
+        return jsonify({"error": f"Restore failed: {e}"}), 500
+
+    except Exception as ex:
+        print(f"Unexpected error: {ex}")
+        return jsonify({"error": f"An unexpected error occurred: {ex}"}), 500

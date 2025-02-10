@@ -15,6 +15,7 @@ class Member(db.Model):
     enrolled_on = Column(TIMESTAMP, default=lambda: datetime.datetime.now(datetime.timezone.utc))
     status = Column(String(20))
     borrowing_behavior = Column(JSON)
+    password_hash = Column(String, nullable=False)  # Add this line for the password hash
 
     lending_transactions = relationship("LendingTransaction", back_populates="member")
 

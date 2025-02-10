@@ -8,6 +8,7 @@ from models.borrowing_rules import BorrowingRule
 from models.lending_transactions import LendingTransaction
 from models.members import Member
 import json
+import logging
 from datetime import datetime, timedelta
 
 # Create the Blueprint for Staff Routes
@@ -124,82 +125,6 @@ def get_current_user():
         return None  # Return None if invalid staff_id
 
     return Staff.query.get(staff_id)
-
-@staff_bp.route('/member_management')
-@jwt_required()
-def member_management():
-    if not is_staff():
-        return redirect('/')  # Redirect to home or unauthorized page
-
-    members = Member.query.all()  # Get all members from the database
-    return render_template('staff/member_management.html', members=members)
-
-
-
-@staff_bp.route('/add_member', methods=['GET', 'POST'])
-@jwt_required()
-def add_member():
-    if not is_staff():
-        return redirect('/')  # Redirect to home or unauthorized page
-    
-    if request.method == 'POST':
-        # Get the data from the form
-        name = request.form['name']
-        membership_number = request.form['membership_number']
-        address = json.dumps(request.form['address'])
-        email = request.form['email']
-        phone = request.form['phone']
-        status = request.form['status']
-        borrowing_behavior = json.dumps(request.form['borrowing_behavior'])
-        
-        # Create the new member
-        new_member = Member(
-            name=name,
-            membership_number=membership_number,
-            address=address,
-            email=email,
-            phone=phone,
-            status=status,
-            borrowing_behavior=borrowing_behavior
-        )
-
-        db.session.add(new_member)
-        db.session.commit()
-
-        return redirect(url_for('staff.profile'))  # Redirect to member management page
-    
-    return render_template('staff/add_member.html')
-
-
-
-
-
-@staff_bp.route('/edit_member/<int:member_id>', methods=['GET', 'POST'])
-@jwt_required()
-def edit_member(member_id):
-    if not is_staff():
-        return redirect('/')  # Redirect to home or unauthorized page
-    
-    # Get the member by ID
-    member = Member.query.get_or_404(member_id)
-    
-    if request.method == 'POST':
-        # Get the updated data from the form
-        member.name = request.form['name']
-        member.membership_number = request.form['membership_number']
-        member.address = json.dumps(request.form['address'])
-        member.email = request.form['email']
-        member.phone = request.form['phone']
-        member.status = request.form['status']
-        member.borrowing_behavior = json.dumps(request.form['borrowing_behavior'])
-
-        # Commit the changes to the database
-        db.session.commit()
-
-        return redirect(url_for('staff.member_management'))  # Redirect to member management page
-    
-    # Render the edit form pre-filled with the current member details
-    return render_template('staff/edit_member.html', member=member)
 
 
 
@@ -336,18 +261,17 @@ def manage_lending_transactions():
         return redirect('/')
 
     lending_transactions = LendingTransaction.query.all()
-    return render_template('staff/manage_lending_transactions.html', lending_transactions=lending_transactions)
+    return render_template('staff/create_lending_transactions.html', lending_transactions=lending_transactions)
 
-
-@staff_bp.route('/lend_book', methods=['GET', 'POST'])
+@staff_bp.route('/create_lending_transaction', methods=['GET', 'POST'])
 @jwt_required()
-def add_lending_transaction():
+def add_lending_transaction(): 
     if not is_staff():
         return redirect('/')
 
     staff_member = get_current_user()
     if not staff_member:
-        return redirect('/')  # Redirect if staff not found
+        return redirect('/')
 
     if request.method == 'POST':
         try:
@@ -356,29 +280,37 @@ def add_lending_transaction():
         except (ValueError, TypeError):
             return "Invalid member or resource ID", 400
 
-        # Validate member existence
         member = Member.query.get(member_id)
+        resource = LibraryResource.query.get(resource_id)
+
         if not member:
             return "Member not found", 404
-
-        # Validate resource existence
-        resource = LibraryResource.query.get(resource_id)
         if not resource:
             return "Resource not found", 404
 
-        # Check borrowing rule based on resource type
+        # Borrowing limit check
+        borrowing_limit = 5
+        current_borrowed = LendingTransaction.query.filter_by(member_id=member_id, status='borrowed').count()
+        if current_borrowed >= borrowing_limit:
+            return "Member has reached the borrowing limit.", 400
+
         borrowing_rule = BorrowingRule.query.filter_by(resource_type=resource.resource_type).first()
         if not borrowing_rule:
             return "Borrowing rule not found for this resource type", 404
 
-        max_borrow_duration = borrowing_rule.max_borrow_duration
-        due_date = datetime.now() + timedelta(days=max_borrow_duration)
+        # Handle due date
+        due_date_form = request.form.get('due_date')
+        if due_date_form:
+            try:
+                due_date = datetime.strptime(due_date_form, '%Y-%m-%d')
+            except ValueError:
+                return "Invalid due date format", 400
+        else:
+            due_date = datetime.now() + timedelta(days=borrowing_rule.max_borrow_duration)
 
-        # Check if the resource is available and has enough items
         if resource.items <= 0 or not resource.available:
             return "Resource is currently unavailable", 400
 
-        # Create new lending transaction
         new_transaction = LendingTransaction(
             member_id=member_id,
             resource_id=resource_id,
@@ -387,19 +319,80 @@ def add_lending_transaction():
             staff_id=staff_member.staff_id
         )
 
-        # Update resource availability if needed
-        resource.items -= 1
-        if resource.items == 0:
-            resource.available = False
+        # Transaction safety
+        try:
+            resource.items -= 1
+            resource.available = resource.items > 0
 
-        db.session.add(new_transaction)
-        db.session.commit()
+            db.session.add(new_transaction)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            return f"An error occurred: {str(e)}", 500
 
         return redirect(url_for('staff.manage_lending_transactions'))
 
     members = Member.query.all()
-    resources = LibraryResource.query.filter(LibraryResource.available == True).all()  # Only show available resources
+    resources = LibraryResource.query.filter(LibraryResource.available == True).all()
     return render_template('staff/create_lending_transactions.html', members=members, resources=resources)
+
+
+
+
+def mark_book_as_returned(transaction_id):
+    """Mark the book as returned and update the transaction."""
+    logging.debug(f"Attempting to mark book as returned for transaction_id: {transaction_id}")
+    
+    # Retrieve the transaction
+    transaction = LendingTransaction.query.filter_by(transaction_id=transaction_id, returned_on=None).first()
+
+    if transaction:
+        logging.debug(f"Transaction found: {transaction.transaction_id} for resource {transaction.resource_id}")
+        
+        # Mark the transaction as returned
+        transaction.returned_on = datetime.utcnow()
+        transaction.status = 'returned'
+        
+        # Retrieve the associated resource
+        resource = LibraryResource.query.get(transaction.resource_id)
+        if resource:
+            logging.debug(f"Resource found: {resource.resource_id}, current available items: {resource.items}")
+            
+            # Increment the resource's available items count
+            resource.items += 1
+            resource.available = True  # Ensure the resource is marked as available
+            logging.debug(f"Resource items updated: {resource.items}, resource available set to: {resource.available}")
+
+            # Commit the changes to the database
+            db.session.commit()
+            logging.debug("Transaction and resource updates committed to the database.")
+            return True
+        else:
+            logging.warning(f"Resource with ID {transaction.resource_id} not found.")
+    else:
+        logging.warning(f"Transaction with ID {transaction_id} not found or already returned.")
+    
+    return False
+
+
+
+@staff_bp.route('/receive_book', methods=['GET', 'POST'])
+def receive_book():
+    if request.method == 'POST':
+        transaction_id = request.form.get('transaction_id')
+
+        # Validate the transaction and mark the book as returned
+        if mark_book_as_returned(transaction_id):
+            alert_message = 'Invalid transaction ID or book already returned.'
+        else:
+            alert_message = 'This book has already been returned.'
+
+        return redirect(url_for('staff.receive_book'))  # Redirect to the same page after submission
+
+    # Only show books that are not yet returned
+    transactions = LendingTransaction.query.filter_by(returned_on=None).all()
+    return render_template('staff/create_lending_transactions.html', transactions=transactions)
+
 
 
 @staff_bp.route('/manage_genres', methods=['GET'])
@@ -445,3 +438,32 @@ def edit_genre(genre_id):
     # Render the edit form with existing genre data when method is GET
     return render_template('staff/edit_genre.html', genre=genre)
 
+
+
+@staff_bp.route('/lending_transactions/create', methods=['GET', 'POST'])
+@jwt_required()
+def create_lending_transaction():
+    if request.method == 'POST':
+        member_id = request.form.get('member_id')
+        resource_id = request.form.get('resource_id')
+        due_date = request.form.get('due_date')  # Add a due date field in the form
+
+        if not due_date:
+            # flash('Due date is required.', 'danger')
+            return redirect(url_for('staff.create_lending_transaction'))
+
+        new_transaction = LendingTransaction(
+            member_id=member_id,
+            resource_id=resource_id,
+            due_date=due_date,
+            status='borrowed'  # Default status
+        )
+        db.session.add(new_transaction)
+        db.session.commit()
+
+        # flash('Lending transaction created successfully!', 'success')
+        return redirect(url_for('staff.manage_lending_transactions'))  # Redirect after creation
+
+    members = Member.query.all()
+    resources = LibraryResource.query.all()
+    return render_template('staff/create_lending_transactions.html', members=members, resources=resources)

@@ -1,0 +1,18 @@
+{% extends 'staff/base.html' %}
+
+{% block content %}
+<h2>Receive Book</h2>
+
+<form method="POST" action="{{ url_for('staff.receive_book') }}">
+    <label for="transaction_id">Select Book to Receive:</label>
+    <select name="transaction_id" required>
+        {% for transaction in transactions %}
+            <option value="{{ transaction.id }}">
+                {{ transaction.library_resource.title }} - Borrowed by {{ transaction.member.name }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Mark as Received</button>
+</form>
+{% endblock %}

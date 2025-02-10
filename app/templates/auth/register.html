@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,15 +19,37 @@
     </nav>
     <main>
         <h2>Register</h2>
+
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+
         <form action="/auth/register" method="POST">
+            <!-- Username -->
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required><br>
 
+            <!-- Email -->
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required><br>
 
+            <!-- Phone (Optional) -->
+            <label for="phone">Phone (Optional):</label>
+            <input type="text" id="phone" name="phone"><br>
+
+            <!-- Address (Optional) -->
+            <label for="address">Address (Optional):</label>
+            <textarea id="address" name="address"></textarea><br>
+
+            <!-- Password -->
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required><br>
+
+            <!-- Status -->
+            <label for="status">Status:</label>
+            <select id="status" name="status" required>
+                <option value="active">Active</option>                
+            </select><br>
 
             <button type="submit">Register</button>
         </form>
@@ -38,4 +58,4 @@
         <p>&copy; 2025 NaLib. All rights reserved.</p>
     </footer>
 </body>
-</html> 
+</html>

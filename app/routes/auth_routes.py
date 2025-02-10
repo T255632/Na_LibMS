@@ -6,6 +6,10 @@ from models import db
 from models.user_roles import UserRole 
 from models.staff import Staff
 from models.members import Member
+import random
+import string
+import datetime
+
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -76,40 +80,55 @@ def login():
 def register():
     if request.method == 'POST':
         username = request.form.get('username')
+        email = request.form.get('email')
+        phone = request.form.get('phone')
+        address = request.form.get('address')
         password = request.form.get('password')
-        role = 'Member'  # Default role
+        status = request.form.get('status')
 
-        logger.debug(f"Registration attempt for username: {username} with role: {role}")
+        # Generate membership number
+        membership_number = generate_membership_number(username)
 
-        if not username or not password:
-            logger.warning("Username or password missing.")
-            return render_template('auth/register.html', error='Please fill in all fields.')
+        logger.debug(f"Registration attempt for username: {username} with membership number: {membership_number}")
 
-        # Check if username already exists
-        if Staff.query.filter_by(name=username).first() or Member.query.filter_by(name=username).first():
-            logger.warning(f"Username already exists: {username}")
-            return render_template('auth/register.html', error='Username already exists.')
+        if not username or not email or not password:
+            logger.warning("Username, email, or password missing.")
+            return render_template('auth/register.html', error='Please fill in all required fields.')
+
+        # Check if email already exists
+        if Member.query.filter_by(email=email).first():
+            logger.warning(f"Email already exists: {email}")
+            return render_template('auth/register.html', error='Email already exists.')
 
         password_hash = generate_password_hash(password)
         logger.debug(f"Generated password hash for user: {username}")
 
-        if role in ['Admin', 'Staff']:
-            new_staff = Staff(name=username, role=role)
-            db.session.add(new_staff)
-            db.session.commit()
-            logger.info(f"New staff created: {username}")
-
-            new_user = UserRole(role=role, password_hash=password_hash, staff_id=new_staff.staff_id)
-            db.session.add(new_user)
-        elif role == 'Member':
-            new_member = Member(name=username, password_hash=password_hash)
-            db.session.add(new_member)
-            logger.info(f"New member created: {username}")
-
+        # Create new member
+        new_member = Member(
+            membership_number=membership_number,
+            name=username,
+            email=email,
+            phone=phone,
+            address=address,
+            status=status,
+            password_hash=password_hash
+        )
+        db.session.add(new_member)
         db.session.commit()
+        logger.info(f"New member created: {username}")
+
         return redirect('/auth/login')
 
     return render_template('auth/register.html')
+
+
+def generate_membership_number(username):
+    """Generate a unique membership number based on the username."""
+    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    random_string = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+    membership_number = f"{username[:3].upper()}-{timestamp}-{random_string}"
+    return membership_number
+
 
 @auth_bp.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
@@ -120,10 +139,15 @@ def forgot_password():
         return render_template('auth/forgot_password.html', message='Password reset instructions sent.')
     return render_template('auth/forgot_password.html')
 
+
 @auth_bp.route('/logout')
 @jwt_required()
 def logout():
-    logger.debug(f"User logging out. JWT identity: {get_jwt_identity()}")
-    response = make_response(redirect('/auth/login'))
-    response.delete_cookie('access_token')
-    return response
+    try:
+        logger.debug(f"User logging out. JWT identity: {get_jwt_identity()}")
+        response = make_response(redirect('/auth/login'))
+        response.delete_cookie('access_token')
+        return response
+    except Exception:
+        # Redirect to the homepage if the token is missing
+        return redirect('/')

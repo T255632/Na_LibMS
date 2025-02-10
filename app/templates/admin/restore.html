@@ -1,0 +1,26 @@
+<<<<<<{% extends 'admin/base.html' %}
+
+{% block content %}
+    
+    <div class="container mx-auto mt-8 p-6 bg-white shadow-md rounded-lg">
+        <h1 class="text-2xl font-bold mb-4">Database Restore</h1>
+
+        <form action="/admin/restore" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <div>
+                <label for="backup_file" class="block text-gray-700 font-bold mb-2">Upload Backup File:</label>
+                <input type="file" id="backup_file" name="backup_file"
+                       class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" required>
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                Restore Database
+            </button>
+        </form>
+
+        <div class="mt-4">
+            <a href="/admin/admin_dashboard" class="text-blue-500 hover:underline">← Back to Dashboard</a>
+        </div>
+    </div>
+{% endblock %}
+>>>>>>

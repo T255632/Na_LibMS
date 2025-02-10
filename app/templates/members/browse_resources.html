@@ -1,0 +1,13 @@
+{% extends 'members/base.html' %}
+
+{% block content %}
+  <h2>Browse Resources</h2>
+  <ul>
+    {% for resource in resources %}
+      <li>
+        <strong>{{ resource.title }}</strong> by {{ resource.author }} ({{ resource.resource_type }})
+        - <a href="{{ url_for('members.resource_details', resource_id=resource.resource_id) }}">See Details</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'members/base.html' %}
+
+{% block content %}
+  <h2>Your Borrowing History</h2>
+  <ul>
+    {% for transaction in transactions %}
+      <li>
+        <strong>{{ transaction.library_resource.title }}</strong> - Due: {{ transaction.due_date }}
+        {% if transaction.returned_on %}
+          - Returned: {{ transaction.returned_on }}
+        {% else %}
+          - <strong>Overdue</strong>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

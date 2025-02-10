@@ -10,7 +10,7 @@ def init_app(app):
     blueprints = [
         (auth_bp, '/auth'),
         (admin_bp, '/admin'),
-        (members_bp, '/members'),
+        (members_bp, '/member'),
         (staff_bp, '/staff')
         
     ]

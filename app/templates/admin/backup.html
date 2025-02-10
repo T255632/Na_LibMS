@@ -1,0 +1,21 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md mt-10">
+    <h2 class="text-2xl font-bold text-center text-gray-800 mb-4">Backup Database</h2>
+
+    <form action="/admin/backup" method="POST" class="space-y-4">
+        <div>
+            <label for="backup_dir" class="block text-sm font-medium text-gray-700">Backup Folder Path:</label>
+            <input type="text" id="backup_dir" name="backup_dir" value="database"
+           class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+
+        </div>
+
+        <button type="submit"
+                class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none">
+            Backup Now
+        </button>
+    </form>
+</div>
+{% endblock %}

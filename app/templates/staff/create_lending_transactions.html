@@ -1,17 +1,146 @@
-<form method="POST">
-    <label for="member_id">Select Member:</label>
-    <select name="member_id" id="member_id" required>
-        {% for member in members %}
-            <option value="{{ member.member_id }}">{{ member.name }}</option>
-        {% endfor %}
-    </select>
+<{% extends "staff/base.html" %}
 
-    <label for="resource_id">Select Resource:</label>
-    <select name="resource_id" id="resource_id" required>
-        {% for resource in resources %}
-            <option value="{{ resource.resource_id }}">{{ resource.title }}</option>
-        {% endfor %}
-    </select>
+{% block content %}
+<div class="transaction-management">
+    <h2>Lending Transactions</h2>
 
-    <button type="submit">Create Lending Transaction</button>
-</form>
+     <!-- Display alert if present -->
+     {% if alert_message %}
+     <script type="text/javascript">
+         alert("{{ alert_message }}");
+     </script>
+     {% endif %}
+
+    <!-- Add New Lending Transaction Button -->
+    <a href="{{ url_for('staff.create_lending_transaction') }}" class="btn-circle">
+        <i class="fas fa-plus"> Lend Book</i>
+    </a>
+
+    <!-- Search Bar for Member and Book -->
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search by Member or Book..." class="form-control" onkeyup="filterTable()">
+    </div>
+
+    <table class="transaction-table" id="transactionTable">
+        <thead>
+            <tr>
+                <th>Transaction ID</th>
+                <th>Member</th>
+                <th>Resource</th>
+                <th>Status</th>
+                <th>Due Date</th>
+                <th>Staff</th>
+                <th>Action</th>                                                      
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for transaction in lending_transactions %}
+            <tr>
+                <td>{{ transaction.transaction_id }}</td>
+                <td>{{ transaction.member.name }}</td>
+                <td>{{ transaction.library_resource.title }}</td>
+                <td>{{ transaction.status }}</td>
+                <td>{{ transaction.due_date.strftime('%Y-%m-%d') }}</td>
+                <td>{{ transaction.staff.name }}</td>
+                <td>
+                    {% if transaction.status != 'returned' %}
+                    <form action="{{ url_for('staff.receive_book') }}" method="POST">
+                        <input type="hidden" name="transaction_id" value="{{ transaction.transaction_id }}">
+                        <button type="submit" class="btn btn-success">Receive</button>
+                    </form>
+                    
+                    {% else %}
+                    <span class="badge badge-secondary">Returned</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7">No transactions found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <hr>
+
+    <!-- Lend Book Form -->
+    <h3>Create Lending Transaction</h3>
+    <form action="{{ url_for('staff.create_lending_transaction') }}" method="POST">
+        <div class="form-group">
+            <label for="member_id">Select Member:</label>
+            <select name="member_id" id="member_id" class="form-control" required onchange="showMemberDetails()">
+                <option value="">-- Select a Member --</option>
+                {% for member in members %}
+                <option value="{{ member.member_id }}" data-email="{{ member.email }}" data-phone="{{ member.phone }}">
+                    {{ member.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Display Member Details -->
+        <div id="memberDetails" style="display: none;">
+            <p><strong>Email:</strong> <span id="memberEmail"></span></p>
+            <p><strong>Phone:</strong> <span id="memberPhone"></span></p>
+        </div>
+
+        <div class="form-group">
+            <label for="resource_id">Select Resource:</label>
+            <select name="resource_id" id="resource_id" class="form-control" required>
+                <option value="">-- Select a Resource --</option>
+                {% for resource in resources %}
+                <option value="{{ resource.resource_id }}">{{ resource.title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="due_date">Due Date:</label>
+            <input type="date" id="due_date" name="due_date" class="form-control" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create Lending Transaction</button>
+    </form>
+</div>
+
+<!-- JavaScript for Member Details and Search -->
+<script>
+    function showMemberDetails() {
+        const memberSelect = document.getElementById('member_id');
+        const selectedOption = memberSelect.options[memberSelect.selectedIndex];
+        const email = selectedOption.getAttribute('data-email');
+        const phone = selectedOption.getAttribute('data-phone');
+
+        if (email && phone) {
+            document.getElementById('memberEmail').textContent = email;
+            document.getElementById('memberPhone').textContent = phone;
+            document.getElementById('memberDetails').style.display = 'block';
+        } else {
+            document.getElementById('memberDetails').style.display = 'none';
+        }
+    }
+
+    function filterTable() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById('transactionTable');
+        const rows = table.getElementsByTagName('tr');
+
+        for (let i = 1; i < rows.length; i++) {
+            const cells = rows[i].getElementsByTagName('td');
+            let match = false;
+
+            for (let j = 1; j < 3; j++) { // Member and Resource columns
+                if (cells[j] && cells[j].innerText.toLowerCase().includes(filter)) {
+                    match = true;
+                    break;
+                }
+            }
+
+            rows[i].style.display = match ? '' : 'none';
+        }
+    }
+</script>
+{% endblock %}

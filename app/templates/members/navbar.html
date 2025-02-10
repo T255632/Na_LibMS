@@ -1,0 +1,29 @@
+<nav class="navbar">
+    <ul class="navbar-menu">
+        <li class="navbar-item">
+            <a href="{{ url_for('members.member_dashboard') }}" class="navbar-link">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+        </li>
+        <li class="navbar-item">
+            <a href="{{ url_for('members.borrowing_history') }}" class="navbar-link">
+                <i class="fas fa-book"></i> Borrowing History
+            </a>
+        </li>
+        <li class="navbar-item">
+            <a href="{{ url_for('members.browse_resources') }}" class="navbar-link">
+                <i class="fas fa-search"></i> Browse Resources
+            </a>
+        </li>
+        <li class="navbar-item">
+            <a href="{{ url_for('members.notifications') }}" class="navbar-link">
+                <i class="fas fa-bell"></i> Notifications
+            </a>
+        </li>
+        <li class="navbar-item">
+            <a href="{{ url_for('auth.logout') }}" class="navbar-link">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </li>
+    </ul>
+</nav>

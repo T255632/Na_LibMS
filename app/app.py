@@ -21,6 +21,10 @@ DB_PASSWORD = os.getenv('POSTGRES_PASSWORD')
 DB_NAME = os.getenv('POSTGRES_DB')
 DB_HOST = os.getenv('POSTGRES_HOST', 'localhost')  # Default to localhost if not set
 DB_PORT = os.getenv('POSTGRES_PORT', '5432')       # Default to 5432 if not set
+DB_CONTAINER = os.getenv('DB_CONTAINER')
+
+
+
 
 app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
